@@ -1,7 +1,15 @@
+import os
+import sys
 from pyspark.sql import *
 from lib.utils import create_spark_config
 from lib.logger import Log4j
-import sys
+from collections import namedtuple
+
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
+
+SurveyRecord = namedtuple("SurveyRecord", ["Age", "Gender", "Country", "State"])
+
 
 if __name__ == '__main__':
     config = create_spark_config()
@@ -20,8 +28,11 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     linesRDD = sc.textFile(sys.argv[1])
-    for line in linesRDD.collect():
-        print(line)
+    partitionedRDD = linesRDD.repartition(2)
+
+    colsRDD = partitionedRDD.map(lambda line: line.replace('"', '').split(","))
+    for data in colsRDD.collect():
+        print(data)
 
     input("Press enter to end\n")  # To hold the spark session from getting stop
 
