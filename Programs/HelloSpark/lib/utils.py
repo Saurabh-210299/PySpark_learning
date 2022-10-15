@@ -6,7 +6,7 @@ from pyspark import SparkConf
 def get_spark_app_config():
     spark_conf = SparkConf()
     config = configparser.ConfigParser()
-    config_file_path = r"F:\PYTHON\COGNIZANT\PYSPARK_LEARNING\APACHE_SPARK\Spark_learning\Programs\HelloSpark\spark" \
+    config_file_path = r"F:\PYTHON\COGNIZANT\PYSPARK_LEARNING\APACHE_SPARK\PySpark_learning\Programs\HelloSpark\spark" \
                        r".conf "
     config.read(config_file_path)
 
