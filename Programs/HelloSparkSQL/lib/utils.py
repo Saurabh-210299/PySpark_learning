@@ -1,5 +1,4 @@
 import configparser
-
 from pyspark import SparkConf
 
 
@@ -13,3 +12,12 @@ def create_spark_app_config():
         config.set(key, value)
 
     return config
+
+
+def load_csv_data(spark, filepath):
+    df = spark.read \
+              .option("header", "true") \
+              .option("inferSchema", "true") \
+              .csv(filepath)
+
+    return df
