@@ -31,11 +31,24 @@ if __name__ == '__main__':
     partitionedRDD = linesRDD.repartition(2)
 
     colsRDD = partitionedRDD.map(lambda line: line.replace('"', '').split(","))
-    for data in colsRDD.collect():
-        print(data)
+    selectRDD = colsRDD.map(lambda cols: SurveyRecord(int(cols[1]), cols[2], cols[3], cols[4]))
+    filteredRDD = selectRDD.filter(lambda r: r.Age < 40)
+    kvRDD = filteredRDD.map(lambda r: (r.Country, 1))
+
+    # Sum using groupByKey()
+    testRDD = kvRDD.groupByKey()
+    finalRDD = testRDD.map(lambda x: (x[0], sum(x[1])))
+    logger.info("Sum using groupByKey()")
+    for data in finalRDD.collect():
+        logger.info(data)
+
+    # Sum using reduceByKey()
+    countRDD = kvRDD.reduceByKey(lambda x, y: (x + y))
+    logger.info("Sum using reduceByKey()")
+    for data in countRDD.collect():
+        logger.info(data)
 
     input("Press enter to end\n")  # To hold the spark session from getting stop
-
     logger.info("Finished HelloRDD program")
 
     spark.stop()
