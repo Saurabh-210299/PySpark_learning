@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     app_name = spark.sparkContext.appName
     logger = Log4j(spark)
-    # logger.info("Started {} program.".format(app_name))
+    logger.info("Started {} program.".format(app_name))
     print(app_name)
 
     flight_time_df = spark.read \
@@ -30,11 +30,21 @@ if __name__ == '__main__':
     print("Partitions after : {}".format(partitioned_df.rdd.getNumPartitions()))
     partitioned_df.groupby(f.spark_partition_id()).count().show()
 
+    """
     partitioned_df.write \
                   .format("avro") \
                   .mode("overwrite") \
                   .option("path", "data_sink/avro/") \
                   .save()
+    """
 
-    # logger.info("Finished {} program.".format(app_name))
+    flight_time_df.write \
+                  .format("json") \
+                  .mode("overwrite") \
+                  .option("path", "data_sink/json/") \
+                  .partitionBy("OP_CARRIER", "ORIGIN") \
+                  .option("maxRecordsPerFile", 10000) \
+                  .save()
+
+    logger.info("Finished {} program.".format(app_name))
     spark.stop()
